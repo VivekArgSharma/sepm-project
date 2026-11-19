@@ -7,6 +7,7 @@ export default function Navbar() {
 
   const navLinks = [
     { label: 'Overview', to: '/', icon: BookOpen },
+    { label: 'Table Explorer', to: '/tables', icon: Layers },
     { label: 'System & DB Health', to: '/status', icon: Activity },
   ];
 

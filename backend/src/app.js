@@ -12,6 +12,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const healthRoutes = require('./routes/healthRoutes');
+const databaseRoutes = require('./routes/databaseRoutes');
 const errorHandler = require('./middlewares/errorHandler');
 const notFoundHandler = require('./middlewares/notFoundHandler');
 
@@ -61,6 +62,9 @@ app.get('/', (req, res) => {
 
 // Health check endpoint
 app.use('/api/health', healthRoutes);
+
+// Database inspector & table viewer endpoint
+app.use('/api/database', databaseRoutes);
 
 // Placeholder mount points for subsequent phases
 // Phase 2: app.use('/api/auth', authRoutes);
