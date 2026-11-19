@@ -1,4 +1,4 @@
-# SkillBridge — Project Report & Documentation
+# SkillBridge — Project Report
 ### Institution: BMS Institute of Technology & Management, Bengaluru-64
 ### Department: Department of Artificial Intelligence and Machine Learning (AIML)
 ### Academic Year: 2026–27
@@ -20,21 +20,6 @@
 
 ---
 
-## 📄 Available Report Deliverables in this Directory
+## 📄 Official Project Report Deliverable
 
-| File | Format | Description |
-| :--- | :--- | :--- |
-| **[`SkillBridge_SEPM_CCA_Final_Report.pdf`](./SkillBridge_SEPM_CCA_Final_Report.pdf)** | Official PDF Document | The complete, formatted final written project report with official cover page, student USNs, and BMSIT&M branding ready for submission. |
-| **[`SkillBridge_SEPM_CCA_Final_Report.docx`](./SkillBridge_SEPM_CCA_Final_Report.docx)** | Editable Word Document | Full editable document with official cover page, student USNs, and formatting. |
-| **[`PROJECT_REPORT.md`](./PROJECT_REPORT.md)** | GitHub Markdown | Full technical report with embedded, live-rendered **Mermaid diagrams** (DFD Levels 0/1/2, Sequence Diagram, Database ER, 3-Tier Architecture) and data dictionaries. |
-
----
-
-## 📊 Embedded System Modelling Diagrams
-All software engineering diagrams are also available as standalone source files in the [`diagrams/`](../diagrams/) directory:
-* **Context Diagram (DFD Level 0):** [`diagrams/dfd_level_0.mmd`](../diagrams/dfd_level_0.mmd)
-* **Subsystem Decomposition (DFD Level 1):** [`diagrams/dfd_level_1.mmd`](../diagrams/dfd_level_1.mmd)
-* **Assessment Engine (DFD Level 2):** [`diagrams/dfd_level_2.mmd`](../diagrams/dfd_level_2.mmd)
-* **Quiz Submission Lifecycle (Sequence Diagram):** [`diagrams/sequence_quiz_submission.mmd`](../diagrams/sequence_quiz_submission.mmd)
-* **Relational Database Schema (ER Diagram):** [`diagrams/database_er_diagram.mmd`](../diagrams/database_er_diagram.mmd)
-* **Three-Tier Architecture Diagram:** [`diagrams/system_architecture.mmd`](../diagrams/system_architecture.mmd)
+* **[`SkillBridge_SEPM_CCA_Final_Report.pdf`](./SkillBridge_SEPM_CCA_Final_Report.pdf)**: Complete, formatted official final written project report with the college seal, student details, SRS, Agile Scrum plan, system design, testing transcripts, and references.
