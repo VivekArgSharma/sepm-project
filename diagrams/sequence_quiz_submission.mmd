@@ -1,0 +1,65 @@
+sequenceDiagram
+    autonumber
+    actor Student as Student (Browser)
+    participant UI as React Frontend (Vite)
+    participant API as Express API Server
+    participant Auth as Auth Middleware (JWT)
+    participant Service as Quiz Service
+    participant DB as PostgreSQL / Local Database
+
+    %% ========================================================================
+    %% PHASE 1: INITIALIZATION & ATTEMPT VALIDATION
+    %% ========================================================================
+    rect rgb(240, 245, 255)
+        note over Student, DB: Attempt Initialization Flow
+        Student->>UI: Clicks "Start Quiz Attempt"
+        UI->>API: POST /api/quizzes/:id/start (Bearer JWT)
+        API->>Auth: Verify JWT & extract student ID
+        Auth-->>API: Student authenticated (Alice, ID: 4)
+        API->>Service: startAttempt(quizId, studentId)
+        Service->>DB: Query past attempts for (quizId, studentId)
+        DB-->>Service: Return attempts count (0 taken, max: 2)
+        Service->>DB: INSERT into quiz_attempts (state: 'IN_PROGRESS', start_time: NOW())
+        DB-->>Service: Created attempt record (ID: 101)
+        Service->>DB: SELECT questions & options (masking is_correct)
+        DB-->>Service: Sanitized questions payload
+        Service-->>API: Return { attemptId: 101, timeLimit: 15, questions }
+        API-->>UI: 201 Created JSON
+        UI->>UI: Start countdown timer (15:00) & display MCQs
+    end
+
+    %% ========================================================================
+    %% SCENARIO A: NORMAL SUBMISSION (Timer Active)
+    %% ========================================================================
+    rect rgb(240, 255, 240)
+        note over Student, DB: Normal Flow: Student Submits Before Expiry
+        Student->>UI: Selects options & clicks "Submit Answers" (Time left: 04:32)
+        UI->>UI: Stop countdown timer
+        UI->>API: POST /api/quizzes/101/submit { answers: [...], isAutoExpired: false }
+        API->>Service: submitAttempt(101, studentId, answers, false)
+        Service->>DB: SELECT is_correct FROM options WHERE question_id = ?
+        DB-->>Service: Return answer keys
+        Service->>Service: Auto-grade: compute marks & pass threshold
+        Service->>DB: INSERT into attempt_answers (attempt_id, marks_awarded)
+        Service->>DB: UPDATE quiz_attempts SET state = 'EVALUATED', score = 9.0, submit_time = NOW()
+        Service-->>API: Evaluated Result: { score: 9.0, total: 10, passed: true }
+        API-->>UI: 200 OK Response
+        UI-->>Student: Display Passed Modal with score breakdown
+    end
+
+    %% ========================================================================
+    %% SCENARIO B: TIMER EXPIRATION FLOW (Auto-Submit)
+    %% ========================================================================
+    rect rgb(255, 245, 240)
+        note over Student, DB: Edge Case Flow: Countdown Timer Expires (00:00)
+        UI->>UI: Timer reaches 00:00 (tick triggers auto-submission)
+        UI->>UI: Lock UI option selection
+        UI->>API: POST /api/quizzes/101/submit { answers: [...], isAutoExpired: true }
+        API->>Service: submitAttempt(101, studentId, answers, true)
+        Service->>Service: Flag as auto-expired submission
+        Service->>DB: Evaluate answers provided up to expiration
+        Service->>DB: UPDATE quiz_attempts SET state = 'EVALUATED', score = calculated_score
+        Service-->>API: Result { score, passed, auto_expired: true }
+        API-->>UI: 200 OK Response
+        UI-->>Student: Show "Time Expired - Answers Auto-Evaluated" Banner & Score
+    end

@@ -1,0 +1,59 @@
+graph TB
+    subgraph Client_Tier ["Presentation Tier (Client Browser)"]
+        User["Student / Instructor / Admin"]
+        ReactApp["React 18 SPA (Vite + Tailwind CSS)<br/>• React Router v6 Navigation<br/>• AuthContext Session Manager<br/>• Axios Interceptor with JWT<br/>• Countdown Timer Engine"]
+        User --> ReactApp
+    end
+
+    subgraph Hosting_Frontend ["Static Web Hosting"]
+        StaticCDN["Static Web Host / Cloudflare CDN / Vercel / Nginx<br/>Port 5173 (Dev) / Port 80, 443 (Prod)"]
+        ReactApp -.-> StaticCDN
+    end
+
+    subgraph API_Tier ["Application / Business Logic Tier (Node.js & Express)"]
+        ReverseProxy["Reverse Proxy / Helmet & CORS Guard"]
+        Router["Express REST API Router"]
+
+        subgraph Middlewares ["Security & Middleware Layer"]
+            JWTAuth["JWT Verification & Role RBAC Guard"]
+            RateLimit["Rate Limiting & Input Validation"]
+            ErrHandler["Centralized Error Handler (AppError)"]
+        end
+
+        subgraph Controllers ["Controllers (HTTP Orchestration)"]
+            AuthCtrl["Auth Controller"]
+            CourseCtrl["Course Controller"]
+            QuizCtrl["Quiz & Evaluation Controller"]
+            AssignCtrl["Assignment Controller"]
+            ProgCtrl["Progress & Analytics Controller"]
+            AdminCtrl["Admin Governance Controller"]
+        end
+
+        subgraph Services ["Services (Business Logic Layer)"]
+            AuthSvc["Auth Service (bcrypt)"]
+            CourseSvc["Course Service"]
+            QuizSvc["Quiz Engine & Auto-Grader"]
+            AssignSvc["Assignment Deadline Service"]
+            ProgSvc["Weighted Progress Calculator"]
+            AdminSvc["Admin Metrics Service"]
+        end
+
+        ReactApp ==>|"HTTPS / REST API JSON Calls"| ReverseProxy
+        ReverseProxy --> JWTAuth --> RateLimit --> Router
+        Router --> Controllers
+        Controllers --> Services
+        Services -.-> ErrHandler
+    end
+
+    subgraph Data_Tier ["Persistence & Data Tier"]
+        DBAdapter["Unified Database Adapter (db.js)"]
+        Services ==> DBAdapter
+
+        subgraph Storage_Options ["Storage Deployments"]
+            LocalDB[("Local Dev Persistence<br/>Zero-setup JSON / SQLite Engine<br/>skillbridge.db / local_store.json")]
+            PostgresCloud[("Production Enterprise Tier<br/>Managed PostgreSQL Database<br/>Port 5432 • Connection Pool (pg)")]
+        end
+
+        DBAdapter -->|"Offline / Local Dev"| LocalDB
+        DBAdapter -.->|"Cloud / Production URI"| PostgresCloud
+    end

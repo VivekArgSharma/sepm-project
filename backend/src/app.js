@@ -1,6 +1,6 @@
 /**
  * Express Application Setup
- * Configures security headers, CORS, body parsers, and route handlers.
+ * Connects layered API routes, security headers, CORS, body parsers, and centralized error handlers.
  */
 
 const express = require('express');
@@ -13,6 +13,14 @@ dotenv.config();
 
 const healthRoutes = require('./routes/healthRoutes');
 const databaseRoutes = require('./routes/databaseRoutes');
+const authRoutes = require('./routes/authRoutes');
+const courseRoutes = require('./routes/courseRoutes');
+const materialRoutes = require('./routes/materialRoutes');
+const quizRoutes = require('./routes/quizRoutes');
+const assignmentRoutes = require('./routes/assignmentRoutes');
+const progressRoutes = require('./routes/progressRoutes');
+const adminRoutes = require('./routes/adminRoutes');
+
 const errorHandler = require('./middlewares/errorHandler');
 const notFoundHandler = require('./middlewares/notFoundHandler');
 
@@ -22,26 +30,14 @@ const app = express();
 app.use(helmet());
 
 // CORS configuration
-const allowedOrigins = [
-  process.env.CLIENT_URL || 'http://localhost:5173',
-  'http://localhost:3000',
-  'http://127.0.0.1:5173',
-];
-
 app.use(
   cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps, curl, Postman)
-      if (!origin || allowedOrigins.includes(origin)) {
-        return callback(null, true);
-      }
-      return callback(null, true); // Dev-friendly fallback
-    },
+    origin: true,
     credentials: true,
   })
 );
 
-// HTTP request logger
+// HTTP request logger (disabled during automated tests)
 if (process.env.NODE_ENV !== 'test') {
   app.use(morgan('dev'));
 }
@@ -50,7 +46,7 @@ if (process.env.NODE_ENV !== 'test') {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
-// Base Welcome Route
+// Root welcome ping
 app.get('/', (req, res) => {
   res.json({
     project: 'SkillBridge - Online Skill-Based Learning & Course Management System',
@@ -60,24 +56,21 @@ app.get('/', (req, res) => {
   });
 });
 
-// Health check endpoint
+// REST API Module Mount Points
 app.use('/api/health', healthRoutes);
-
-// Database inspector & table viewer endpoint
 app.use('/api/database', databaseRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/materials', materialRoutes);
+app.use('/api/quizzes', quizRoutes);
+app.use('/api/assignments', assignmentRoutes);
+app.use('/api/progress', progressRoutes);
+app.use('/api/admin', adminRoutes);
 
-// Placeholder mount points for subsequent phases
-// Phase 2: app.use('/api/auth', authRoutes);
-// Phase 3: app.use('/api/courses', courseRoutes);
-// Phase 4: app.use('/api/quizzes', quizRoutes);
-// Phase 5: app.use('/api/assignments', assignmentRoutes);
-// Phase 6: app.use('/api/progress', progressRoutes);
-// Phase 6: app.use('/api/admin', adminRoutes);
-
-// Catch 404
+// Catch 404 for unmapped endpoints
 app.use(notFoundHandler);
 
-// Global Centralized Error Handler
+// Centralized Error Handling Middleware
 app.use(errorHandler);
 
 module.exports = app;

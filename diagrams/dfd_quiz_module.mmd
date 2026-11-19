@@ -1,0 +1,79 @@
+%% Data Flow Diagrams (DFD) for the Quiz Module
+%% Level 0, Level 1, and Level 2
+
+%% ============================================================================
+%% DFD LEVEL 0: CONTEXT DIAGRAM
+%% ============================================================================
+graph TD
+    Student["Student (External Entity)"]
+    Instructor["Instructor (External Entity)"]
+    LMS["0.0 Quiz Management & Evaluation System"]
+    DB[("Database Store")]
+
+    Instructor -->|"Create Quiz & Question Bank"| LMS
+    LMS -->|"Confirmation & Quiz Analytics"| Instructor
+
+    Student -->|"Request Quiz Attempt & Submit Answers"| LMS
+    LMS -->|"Active Timer, Questions, Evaluated Score"| Student
+
+    LMS <-->|"Read Questions / Store Scores & State"| DB
+
+%% ============================================================================
+%% DFD LEVEL 1: MAJOR PROCESS DECOMPOSITION
+%% ============================================================================
+graph TD
+    subgraph DFD_Level_1 ["DFD Level 1: Quiz Subsystem Decomposition"]
+        P1["1.0 Author Quiz & MCQs"]
+        P2["2.0 Initialize & Validate Attempt"]
+        P3["3.0 Monitor Timer & Countdown"]
+        P4["4.0 Auto-Grade & Evaluate Answers"]
+        P5["5.0 Record Progress & Results"]
+
+        D_Quizzes[("D1: Quizzes Store")]
+        D_Questions[("D2: Questions & Options")]
+        D_Attempts[("D3: Quiz Attempts")]
+        D_Answers[("D4: Attempt Answers")]
+        D_Progress[("D5: Student Progress")]
+
+        Inst["Instructor"] -->|"Quiz Metadata & MCQs"| P1
+        P1 -->|"Store Quiz Config"| D_Quizzes
+        P1 -->|"Store Questions & Answer Key"| D_Questions
+
+        Stud["Student"] -->|"Start Quiz Request"| P2
+        D_Quizzes -->|"Check Max Attempts & Time Limit"| P2
+        D_Attempts -->|"Check Previous Attempts"| P2
+        P2 -->|"Create Attempt (State: IN_PROGRESS)"| D_Attempts
+        P2 -->|"Send Questions without Answer Key"| Stud
+
+        Stud -->|"Keep-Alive / Active Session"| P3
+        P3 -->|"Timer Expired Trigger"| P4
+
+        Stud -->|"Submit Selected Answers"| P4
+        D_Questions -->|"Retrieve Correct Option Keys"| P4
+        P4 -->|"Calculate Score & Mark EVALUATED"| D_Attempts
+        P4 -->|"Store Question Choices"| D_Answers
+        P4 -->|"Trigger Progress Update"| P5
+        P5 -->|"Update Student Course %"| D_Progress
+        P4 -->|"Return Evaluated Score & Review"| Stud
+    end
+
+%% ============================================================================
+%% DFD LEVEL 2: DETAILED EVALUATION PROCESS (4.0)
+%% ============================================================================
+graph TD
+    subgraph DFD_Level_2 ["DFD Level 2: Decomposed Process 4.0 (Auto-Grade & Evaluate Answers)"]
+        P4_1["4.1 Verify Attempt Ownership & Time Limit"]
+        P4_2["4.2 Match Choices Against Answer Key"]
+        P4_3["4.3 Aggregate Marks & Compute Score"]
+        P4_4["4.4 Determine Pass/Fail Status"]
+        P4_5["4.5 Transition Attempt State to EVALUATED"]
+
+        SubIn["Answers Payload / Auto-Expire Signal"] --> P4_1
+        P4_1 -->|"Validated Submission"| P4_2
+        D_Options[("Options Store (is_correct)")] -->|"Correct Key"| P4_2
+        P4_2 -->|"Per-Question Points"| P4_3
+        P4_3 -->|"Total Raw Score"| P4_4
+        D_QuizPassing[("Quizzes Store (passing_marks)")] -->|"Pass Threshold"| P4_4
+        P4_4 -->|"Final Result Object"| P4_5
+        P4_5 -->|"Persisted Result"| OutStud["Student Result Modal"]
+    end
