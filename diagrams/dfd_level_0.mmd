@@ -1,0 +1,13 @@
+graph TD
+    Student["Student (External Entity)"]
+    Instructor["Instructor (External Entity)"]
+    LMS["0.0 Quiz Management & Assessment System"]
+    DB[("SkillBridge Database Store")]
+
+    Instructor -->|"Create Quiz & Question Bank"| LMS
+    LMS -->|"Confirmation & Quiz Analytics"| Instructor
+
+    Student -->|"Request Quiz Attempt & Submit Answers"| LMS
+    LMS -->|"Active Timer, Questions, Evaluated Score"| Student
+
+    LMS <-->|"Read Questions / Store Scores & State"| DB

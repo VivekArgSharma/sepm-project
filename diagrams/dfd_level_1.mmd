@@ -1,0 +1,35 @@
+graph TD
+    subgraph DFD_Level_1 ["DFD Level 1: Quiz Subsystem Decomposition"]
+        P1["1.0 Author Quiz & MCQs"]
+        P2["2.0 Initialize & Validate Attempt"]
+        P3["3.0 Monitor Timer Countdown"]
+        P4["4.0 Auto-Grade & Evaluate Answers"]
+        P5["5.0 Record Progress & Results"]
+
+        D1[("D1: Quizzes Store")]
+        D2[("D2: Questions & Options")]
+        D3[("D3: Quiz Attempts")]
+        D4[("D4: Attempt Answers")]
+        D5[("D5: Student Progress")]
+
+        Inst["Instructor"] -->|"Quiz Metadata & MCQs"| P1
+        P1 -->|"Store Quiz Config"| D1
+        P1 -->|"Store MCQs & Answer Keys"| D2
+
+        Stud["Student"] -->|"Start Quiz Request"| P2
+        D1 -->|"Validate Max Attempts & Time Limit"| P2
+        D3 -->|"Check Past Student Attempts"| P2
+        P2 -->|"Record Attempt (IN_PROGRESS)"| D3
+        P2 -->|"Send Questions without Answer Key"| Stud
+
+        Stud -->|"Keep-Alive Session"| P3
+        P3 -->|"Timer Expiry Trigger (00:00)"| P4
+
+        Stud -->|"Submit Selected Answers"| P4
+        D2 -->|"Fetch Correct Answer Keys"| P4
+        P4 -->|"Store Points & EVALUATED State"| D3
+        P4 -->|"Store Selected Options"| D4
+        P4 -->|"Trigger Course Progress"| P5
+        P5 -->|"Update Student Completion %"| D5
+        P4 -->|"Return Evaluated Score & Review"| Stud
+    end

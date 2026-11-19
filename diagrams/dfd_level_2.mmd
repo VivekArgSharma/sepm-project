@@ -1,0 +1,17 @@
+graph TD
+    subgraph DFD_Level_2 ["DFD Level 2: Detailed Process 4.0 Auto-Evaluation"]
+        P4_1["4.1 Verify Attempt Ownership & Time Window"]
+        P4_2["4.2 Match Choices Against Answer Key"]
+        P4_3["4.3 Aggregate Marks & Compute Score"]
+        P4_4["4.4 Determine Pass/Fail Status"]
+        P4_5["4.5 Transition Attempt State to EVALUATED"]
+
+        SubIn["Answers Payload / Auto-Expire Signal"] --> P4_1
+        P4_1 -->|"Validated Payload"| P4_2
+        D_Options[("Options Store (is_correct)")] -->|"Correct Key"| P4_2
+        P4_2 -->|"Per-Question Points"| P4_3
+        P4_3 -->|"Total Raw Score"| P4_4
+        D_QuizPassing[("Quizzes Store (passing_marks)")] -->|"Pass Threshold"| P4_4
+        P4_4 -->|"Final Result Object"| P4_5
+        P4_5 -->|"Persisted Result"| OutStud["Student Result Modal"]
+    end
