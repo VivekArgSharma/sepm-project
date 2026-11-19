@@ -13,7 +13,7 @@
 
 | Team Member | USN | Branch | Assigned Role |
 | :--- | :--- | :--- | :--- |
-| **Satyam Kumar** | `1TD24AI164` | AIML | Requirements & Analysis |
+| **Satyam Kumar** | `1TD24AI162` | AIML | Requirements & Analysis |
 | **Ayush Kumar** | `1TD24AI039` | AIML | Design & Database Architecture |
 | **Vivek Sharma** | `1TD24AI190` | AIML | Full-Stack Development & Testing |
 | **Ranjeet Singh** | `1TD24AI145` | AIML | Project Management & Documentation |
