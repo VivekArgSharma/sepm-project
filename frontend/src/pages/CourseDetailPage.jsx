@@ -5,7 +5,7 @@ import { useAuth } from '../context/AuthContext';
 import { 
   BookOpen, Layers, CheckCircle2, Circle, Clock, Award, 
   FileText, ExternalLink, Video, Link2, FileCheck, Send, 
-  BarChart3, Users, AlertCircle, RefreshCw, ChevronRight, PlayCircle
+  BarChart3, Users, AlertCircle, RefreshCw, ChevronRight, PlayCircle, Plus
 } from 'lucide-react';
 
 export default function CourseDetailPage() {
@@ -21,6 +21,19 @@ export default function CourseDetailPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('lessons'); // 'lessons' | 'quizzes' | 'assignments' | 'progress' | 'class'
 
+  // Modals
+  const [showAddModuleModal, setShowAddModuleModal] = useState(false);
+  const [moduleTitle, setModuleTitle] = useState('');
+  const [moduleDesc, setModuleDesc] = useState('');
+  const [moduleLoading, setModuleLoading] = useState(false);
+
+  const [activeModuleForLesson, setActiveModuleForLesson] = useState(null);
+  const [lessonTitle, setLessonTitle] = useState('');
+  const [lessonDesc, setLessonDesc] = useState('');
+  const [lessonType, setLessonType] = useState('VIDEO');
+  const [lessonUrl, setLessonUrl] = useState('');
+  const [lessonLoading, setLessonLoading] = useState(false);
+
   // Assignment submission modal state
   const [submittingAssignment, setSubmittingAssignment] = useState(null);
   const [subType, setSubType] = useState('LINK');
@@ -35,7 +48,6 @@ export default function CourseDetailPage() {
       setCourse(res.data);
 
       if (isAuthenticated) {
-        // Fetch quizzes, assignments, and progress
         const [qRes, aRes] = await Promise.all([
           api.get(`/quizzes/course/${id}`).catch(() => ({ data: [] })),
           api.get(`/assignments/course/${id}`).catch(() => ({ data: [] })),
@@ -91,6 +103,57 @@ export default function CourseDetailPage() {
       fetchCourseData();
     } catch (err) {
       console.error('Error toggling completion:', err);
+    }
+  };
+
+  const handleAddModule = async (e) => {
+    e.preventDefault();
+    if (!moduleTitle.trim()) return;
+    setModuleLoading(true);
+    try {
+      await api.post('/materials/modules', {
+        course_id: id,
+        title: moduleTitle,
+        description: moduleDesc,
+        order_index: (course.modules?.length || 0) + 1,
+      });
+      setMessage('New module added successfully!');
+      setShowAddModuleModal(false);
+      setModuleTitle('');
+      setModuleDesc('');
+      fetchCourseData();
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      alert(err.message || 'Failed to add module');
+    } finally {
+      setModuleLoading(false);
+    }
+  };
+
+  const handleAddLesson = async (e) => {
+    e.preventDefault();
+    if (!lessonTitle.trim() || !lessonUrl.trim()) return;
+    setLessonLoading(true);
+    try {
+      await api.post('/materials', {
+        module_id: activeModuleForLesson.id,
+        title: lessonTitle,
+        description: lessonDesc,
+        content_type: lessonType,
+        url_or_path: lessonUrl,
+        order_index: (activeModuleForLesson.materials?.length || 0) + 1,
+      });
+      setMessage('New lesson added to module!');
+      setActiveModuleForLesson(null);
+      setLessonTitle('');
+      setLessonDesc('');
+      setLessonUrl('');
+      fetchCourseData();
+      setTimeout(() => setMessage(''), 3000);
+    } catch (err) {
+      alert(err.message || 'Failed to add lesson');
+    } finally {
+      setLessonLoading(false);
     }
   };
 
@@ -171,6 +234,16 @@ export default function CourseDetailPage() {
                 }`}
               >
                 {course.is_enrolled ? 'Drop Course' : 'Register for Course'}
+              </button>
+            )}
+
+            {isInstructor && (
+              <button
+                onClick={() => setShowAddModuleModal(true)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs shadow-sm transition"
+              >
+                <Plus className="w-4 h-4" />
+                Add Module
               </button>
             )}
 
@@ -269,6 +342,19 @@ export default function CourseDetailPage() {
       {/* TAB 1: Lessons & Modules */}
       {activeTab === 'lessons' && (
         <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <h2 className="text-base font-bold text-slate-900">Curriculum Outline</h2>
+            {isInstructor && (
+              <button
+                onClick={() => setShowAddModuleModal(true)}
+                className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl border border-indigo-200 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Add Module
+              </button>
+            )}
+          </div>
+
           {(!course.modules || course.modules.length === 0) ? (
             <div className="bg-white rounded-2xl p-8 border border-slate-200 text-center text-slate-500 text-xs">
               No modules published yet for this course.
@@ -284,9 +370,20 @@ export default function CourseDetailPage() {
                     <h3 className="font-bold text-slate-900 text-sm">{mod.title}</h3>
                     {mod.description && <p className="text-xs text-slate-500">{mod.description}</p>}
                   </div>
-                  <span className="text-xs text-slate-400 font-medium">
-                    {mod.materials?.length || 0} Lessons
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-slate-400 font-medium">
+                      {mod.materials?.length || 0} Lessons
+                    </span>
+                    {isInstructor && (
+                      <button
+                        onClick={() => setActiveModuleForLesson(mod)}
+                        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-[11px] font-semibold text-slate-700 hover:bg-slate-100 transition"
+                      >
+                        <Plus className="w-3 h-3 text-indigo-600" />
+                        Add Lesson
+                      </button>
+                    )}
+                  </div>
                 </div>
 
                 <div className="divide-y divide-slate-100">
@@ -593,6 +690,153 @@ export default function CourseDetailPage() {
                 ))}
               </tbody>
             </table>
+          </div>
+        </div>
+      )}
+
+      {/* Add Module Modal (Instructor / Admin only) */}
+      {showAddModuleModal && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <h3 className="font-bold text-lg text-slate-900">Add New Module</h3>
+            <form onSubmit={handleAddModule} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Module Title</label>
+                <input
+                  type="text"
+                  required
+                  value={moduleTitle}
+                  onChange={(e) => setModuleTitle(e.target.value)}
+                  placeholder="e.g. Module 3: Advanced State & Custom Hooks"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Module Description</label>
+                <textarea
+                  rows="3"
+                  value={moduleDesc}
+                  onChange={(e) => setModuleDesc(e.target.value)}
+                  placeholder="What will students learn in this module?"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                ></textarea>
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowAddModuleModal(false)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={moduleLoading}
+                  className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow disabled:opacity-50"
+                >
+                  {moduleLoading ? 'Adding...' : 'Create Module'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Add Lesson Modal (Instructor / Admin only) */}
+      {activeModuleForLesson && (
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4 z-50 animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+            <h3 className="font-bold text-lg text-slate-900">
+              Add Lesson to: {activeModuleForLesson.title}
+            </h3>
+            <form onSubmit={handleAddLesson} className="space-y-4">
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Lesson Title</label>
+                <input
+                  type="text"
+                  required
+                  value={lessonTitle}
+                  onChange={(e) => setLessonTitle(e.target.value)}
+                  placeholder="e.g. Understanding useCallback and useMemo"
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Content Type</label>
+                <div className="grid grid-cols-4 gap-1.5">
+                  {['VIDEO', 'PDF', 'LINK', 'TEXT'].map((t) => (
+                    <button
+                      key={t}
+                      type="button"
+                      onClick={() => setLessonType(t)}
+                      className={`py-1.5 rounded-lg text-[11px] font-semibold border transition ${
+                        lessonType === t
+                          ? 'border-indigo-600 bg-indigo-50 text-indigo-700'
+                          : 'border-slate-200 text-slate-600 hover:bg-slate-50'
+                      }`}
+                    >
+                      {t}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">
+                  {lessonType === 'TEXT' ? 'Lesson Notes / Content' : 'Resource URL (YouTube, PDF, Doc link)'}
+                </label>
+                {lessonType === 'TEXT' ? (
+                  <textarea
+                    rows="3"
+                    required
+                    value={lessonUrl}
+                    onChange={(e) => setLessonUrl(e.target.value)}
+                    placeholder="Enter learning notes..."
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  ></textarea>
+                ) : (
+                  <input
+                    type="url"
+                    required
+                    value={lessonUrl}
+                    onChange={(e) => setLessonUrl(e.target.value)}
+                    placeholder="https://..."
+                    className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  />
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <label className="text-xs font-semibold text-slate-700">Short Description (Optional)</label>
+                <input
+                  type="text"
+                  value={lessonDesc}
+                  onChange={(e) => setLessonDesc(e.target.value)}
+                  placeholder="Brief summary..."
+                  className="w-full px-3 py-2 rounded-xl bg-slate-50 border border-slate-200 text-xs focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setActiveModuleForLesson(null)}
+                  className="px-4 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold hover:bg-slate-50"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={lessonLoading}
+                  className="px-5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow disabled:opacity-50"
+                >
+                  {lessonLoading ? 'Saving...' : 'Add Lesson'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}
