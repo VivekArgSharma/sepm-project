@@ -1,4 +1,18 @@
+<div align="center">
 
+  <img src="./images/image1.png" alt="BMSIT&M Logo" width="160" />
+
+  <h2>BMS INSTITUTE OF TECHNOLOGY & MANAGEMENT</h2>
+
+  <p>Avalahalli, Doddaballapur Main Road, Yelahanka, Bengaluru – 560064</p>
+
+  <p><strong>Department of Artificial Intelligence and Machine Learning</strong></p>
+
+  <p><strong>Academic Year: 2026–27</strong></p>
+
+</div>
+
+---
 
 **SKILLBRIDGE**
 
@@ -6,7 +20,7 @@
 
 **SOFTWARE ENGINEERING & PROJECT MANAGEMENT**
 
-**CCA – TEAM ACTIVITY (20 MARKS)**
+**CCA **
 
 Course Code: [Course Code]
 
@@ -16,12 +30,12 @@ SDG Mapping: SDG 9 – Industry, Innovation and Infrastructure
 
 | **Student** | **Name** | USN | **Branch** | **Assigned Role** |
 | --- | --- | --- | --- | --- |
-| Student 1 | Satyam Kumar | [Enter roll no.] | AIML | Requirements & Analysis |
-| Student 2 | Ayush Kumar | [Enter roll no.] | AIML | Design & Database |
-| Student 3 | Vivek Sharma | [Enter roll no.] | AIML | Development & Testing |
-| Student 4 | Ranjeet Singh | [Enter roll no.] | AIML | Project Management & Documentation |
+| Student 1 | Satyam Kumar | 1TD24AI164 | AIML | Requirements & Analysis |
+| Student 2 | Ayush Kumar | 1TD24AI039 | AIML | Design & Database |
+| Student 3 | Vivek Sharma | 1TD24AI190 | AIML | Development & Testing |
+| Student 4 | Ranjeet Singh | 1TD24AI145 | AIML | Project Management & Documentation |
 
-Department: Artificial Intelligence and Machine LearbubgAcademic Year: 2026-27
+Department: Artificial Intelligence and Machine LearningAcademic Year: 2026-27
 
 # DOCUMENT CONTROL
 
@@ -192,7 +206,6 @@ The countdown is calculated from the server-provided expires_at timestamp. The b
 * Users access the system through a modern browser and a functioning network connection.
 * Node.js, npm, PostgreSQL and the required frontend build tooling are available for development and deployment.
 * Database credentials and JWT signing secrets are provided through environment variables and are not committed to source control.
-* Server time is synchronized and is the authoritative source for quiz expiry and assignment deadlines.
 
 # 3. SELECTED PROCESS MODEL
 
@@ -435,21 +448,6 @@ Commit the transaction and return the finalized result. A repeated request must 
 
 ## 5.4 Data Dictionary
 
-| **Data Flow** | **Source** | **Destination** | **Data Elements / Description** |
-| --- | --- | --- | --- |
-| 1. Registration Request | Student / Instructor | Authentication API | Name or profile fields, email, password and validated registration data. |
-| 2. Authentication Token | Authentication Service | Protected API Middleware | JWT subject, role, issue time, expiry and token claims. |
-| 3. Course Definition | Instructor | Authoring Process / D1 | Course identifier, title, description, owner, publication state and skill metadata. |
-| 4. Learning Material | Instructor | Material Store / Student UI | Material identifier, module identifier, title, type, resource reference and display order. |
-| 5. Enrollment Request | Student | Enrollment Service | Student identifier, course identifier, request timestamp and enrollment status. |
-| 6. Quiz Start Request | Student | Attempt Validation | User identifier, quiz identifier, authentication context and start request. |
-| 7. Attempt Metadata | Attempt Validation | Timer Monitoring / D3 | Attempt identifier, started_at, expires_at, duration and status. |
-| 8. Timer Expiry Event | Timer Monitoring | Auto-Grading | Attempt identifier, expiry timestamp and expiry-triggered submission reason. |
-| 9. Answer Submission | Student UI | Auto-Grading | Attempt identifier, question identifiers, selected option identifiers and submission payload. |
-| 10. Grade Result | Auto-Grading | Progress Logging / Student UI | Earned marks, maximum marks, percentage, answer outcomes and final state. |
-| 11. Assignment Submission | Student | Assignment Service / D4 | Assignment identifier, student identifier, response/file reference and server receipt timestamp. |
-| 12. Progress Snapshot | Progress Logging | Student / Instructor | Material completion, quiz results, assignment status and course-level progress indicators. |
-
 ## 5.5 UML Sequence Diagram Walkthrough
 
 ```mermaid
@@ -523,9 +521,6 @@ sequenceDiagram
 ### 5.5.1 Normal Submission Flow
 
 In the normal flow, the student submits answers before the expiry timestamp. The API validates the attempt, the grading service evaluates the answers and the database stores the result.
-
-| Student UI       Express API       Attempt Service      Grading Service       Database <br> |                |                    |                    |                  | <br> |-- Start Quiz ->|                    |                    |                  | <br> |                |-- Validate ------->|                    |                  | <br> |                |                    |-- Create attempt -------------------->| <br> |                |                    |<-- attemptId, expiresAt ---------------| <br> |<-- Attempt ----|                    |                    |                  | <br> |                |                    |                    |                  | <br> |  Answer quiz   |                    |                    |                  | <br> |                |                    |                    |                  | <br> |-- Submit ----->|-- Validate state -->|                    |                  | <br> |                |                    |-- Evaluate answers ->|                  | <br> |                |                    |                    |-- Read answer key>| <br> |                |                    |                    |<-- Questions -----| <br> |                |                    |                    |-- Save result --->| <br> |                |                    |                    |<-- Commit --------| <br> |<-- Grade ------|<-------------------|<-------------------|                  | <br> |                |                    |                    |                  | |
-| --- |
 
 ### 5.5.2 Timer-Expiry Auto-Submit Flow
 
@@ -830,9 +825,6 @@ graph TB
 | Presentation Tier | React 18, Vite, Tailwind CSS | Renders responsive pages, navigation, course player, quiz countdown, assignment interfaces, progress dashboards and role-specific views. Communicates with the backend through API requests. |
 | Application Tier | Node.js, Express; routes, controllers, services and middleware | Implements API endpoints, authentication, RBAC, validation, course logic, attempt lifecycle, timer expiry enforcement, auto-grading, assignment deadlines and progress aggregation. |
 | Data Tier | PostgreSQL with thirteen normalized tables; zero-setup local persistent fallback | Persists users, courses, enrollments, modules, materials, progress, quizzes, questions, options, attempts, answers, assignments and submissions. |
-
-| +-----------------------------------+ <br> | PRESENTATION TIER                 | <br> | React 18 + Vite + Tailwind CSS    | <br> | Browser UI / Course Player        | <br> +----------------+------------------+ <br> | <br> | HTTPS / JSON API <br> v <br> +-----------------------------------+ <br> | APPLICATION TIER                  | <br> | Node.js + Express                 | <br> | Routes -> Controllers -> Services | <br> | Middleware: JWT / RBAC / Errors   | <br> +----------------+------------------+ <br> | <br> | SQL / Data Access <br> v <br> +-----------------------------------+ <br> | DATA TIER                         | <br> | PostgreSQL                        | <br> | 13 normalized relational tables  | <br> | Local persistent fallback        | <br> +-----------------------------------+ |
-| --- |
 
 ### Deployment Topology
 

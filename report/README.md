@@ -1,17 +1,11 @@
 # SkillBridge — Project Report & Documentation
+### Institution: BMS Institute of Technology & Management, Bengaluru-64
+### Department: Department of Artificial Intelligence and Machine Learning (AIML)
+### Academic Year: 2026–27
 ### Course: Software Engineering & Project Management (SEPM)
 ### Activity: Continuous Comprehensive Assessment (CCA – 20 Marks)
 ### Problem Statement: #16 — Online Skill-Based Learning & Course Management System
-
----
-
-## 📄 Available Report Deliverables in this Directory
-
-| File | Format | Description |
-| :--- | :--- | :--- |
-| **[`SkillBridge_SEPM_CCA_Final_Report.pdf`](./SkillBridge_SEPM_CCA_Final_Report.pdf)** | Official PDF Document | The complete, formatted final written project report ready for college submission. |
-| **[`SkillBridge_SEPM_CCA_Final_Report.docx`](./SkillBridge_SEPM_CCA_Final_Report.docx)** | Editable Word Document | Full editable document with official cover page, student USNs, and formatting. |
-| **[`PROJECT_REPORT.md`](./PROJECT_REPORT.md)** | GitHub Markdown | Full technical report with embedded, live-rendered **Mermaid diagrams** (DFD Levels 0/1/2, Sequence Diagram, Database ER, 3-Tier Architecture) and data dictionaries. |
+### SDG Alignment: SDG 9 — Industry, Innovation and Infrastructure
 
 ---
 
@@ -19,10 +13,20 @@
 
 | Team Member | USN | Branch | Assigned Role |
 | :--- | :--- | :--- | :--- |
-| **Satyam Kumar** | *[Roll No.]* | AIML | Requirements & Analysis |
-| **Ayush Kumar** | *[Roll No.]* | AIML | Design & Database Architecture |
-| **Vivek Sharma** | *[Roll No.]* | AIML | Full-Stack Development & Testing |
-| **Ranjeet Singh** | *[Roll No.]* | AIML | Project Management & Documentation |
+| **Satyam Kumar** | `1TD24AI164` | AIML | Requirements & Analysis |
+| **Ayush Kumar** | `1TD24AI039` | AIML | Design & Database Architecture |
+| **Vivek Sharma** | `1TD24AI190` | AIML | Full-Stack Development & Testing |
+| **Ranjeet Singh** | `1TD24AI145` | AIML | Project Management & Documentation |
+
+---
+
+## 📄 Available Report Deliverables in this Directory
+
+| File | Format | Description |
+| :--- | :--- | :--- |
+| **[`SkillBridge_SEPM_CCA_Final_Report.pdf`](./SkillBridge_SEPM_CCA_Final_Report.pdf)** | Official PDF Document | The complete, formatted final written project report with official cover page, student USNs, and BMSIT&M branding ready for submission. |
+| **[`SkillBridge_SEPM_CCA_Final_Report.docx`](./SkillBridge_SEPM_CCA_Final_Report.docx)** | Editable Word Document | Full editable document with official cover page, student USNs, and formatting. |
+| **[`PROJECT_REPORT.md`](./PROJECT_REPORT.md)** | GitHub Markdown | Full technical report with embedded, live-rendered **Mermaid diagrams** (DFD Levels 0/1/2, Sequence Diagram, Database ER, 3-Tier Architecture) and data dictionaries. |
 
 ---
 
